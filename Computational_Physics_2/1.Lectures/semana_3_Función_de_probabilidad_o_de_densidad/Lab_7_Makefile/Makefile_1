@@ -1,0 +1,11 @@
+# Copy Makefile file
+# cp Makefile_1 Makefile
+
+CC=gcc
+CFLAGS=-I.
+
+hellomake: src/hello_make.c lib/hello_func.c
+	$(CC) -o out src/hello_make.c lib/hello_func.c $(CFLAGS)
+
+clean:
+	rm -f *.o  out  .*

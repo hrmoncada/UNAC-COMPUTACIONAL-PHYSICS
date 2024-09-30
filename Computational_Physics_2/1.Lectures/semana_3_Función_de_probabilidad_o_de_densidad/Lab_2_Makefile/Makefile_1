@@ -1,0 +1,12 @@
+# Copy Makefile file
+# cp Makefile_1 Makefile
+# make -f Makefile_1
+
+main: main.cpp Point.cpp Rectangle.cpp
+	g++ -Wall -g -o out main.cpp Point.cpp Rectangle.cpp -I.
+
+run: out
+	./out
+
+clean:
+	rm -f *.o  out main .*

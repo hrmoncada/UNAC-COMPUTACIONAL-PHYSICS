@@ -1,0 +1,12 @@
+# Copy Makefile file
+# cp Makefile_1 Makefile
+# make -f Makefile_1
+
+hellomake: hello_make.c hello_func.c
+	gcc -o out hello_make.c hello_func.c -I.
+
+run: out
+	./out
+
+clean:
+	rm -f *.o  out  .*

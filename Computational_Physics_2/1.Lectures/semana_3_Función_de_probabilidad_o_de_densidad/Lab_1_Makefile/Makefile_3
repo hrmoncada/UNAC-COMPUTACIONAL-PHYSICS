@@ -1,0 +1,20 @@
+# Copy Makefile file
+# cp Makefile_3 Makefile
+# make -f Makefile_3
+
+CC = gcc
+CFLAGS = -I.
+DEPS = hello_make.h
+OBJ = hello_make.o hello_func.o 
+
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+hellomake: $(OBJ)
+	$(CC) -o $@ $^ $(CFLAGS)
+
+run:
+	./hellomake
+
+clean:
+	rm -f *.o  hellomake .*
