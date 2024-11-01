@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<!-- saved from url=(0076)https://notmatthancock.github.io/2017/02/10/calling-fortran-from-python.html -->
+<html class="gr__notmatthancock_github_io"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Calling Fortran from Python with f2py</title>
+    <meta name="description" content="A short guide on using f2py to call Fortran subroutines from Python">
+
+    <link href="./Calling Fortran from Python with f2py_files/css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="./Calling Fortran from Python with f2py_files/main.css">
+    <link rel="canonical" href="http://notmatthancock.github.com/2017/02/10/calling-fortran-from-python.html">
+
+    <link rel="icon" type="image/png" href="https://notmatthancock.github.io/favicon.ico">
+    <!--link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" -->
+    <!--link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" -->
+<script type="text/javascript" async="" src="./Calling Fortran from Python with f2py_files/16a168f0af2da0c3c2.js"></script></head>
+
+
+  <body data-gr-c-s-loaded="true">
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="https://notmatthancock.github.io/">Matt Hancock </a> <a class="site-title notes-title-link" href="https://notmatthancock.github.io/notes">/ notes</a>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+  <header class="post-header">
+    <h1 class="post-title">Calling Fortran from Python with f2py</h1>
+    <p class="post-meta">Feb 10, 2017</p>
+    <div class="post-tags">
+  Tags: 
+  
+  
+  <a href="https://notmatthancock.github.io/notes/tags/#software">software</a>,
+  
+  <a href="https://notmatthancock.github.io/notes/tags/#fortran">fortran</a>,
+  
+  <a href="https://notmatthancock.github.io/notes/tags/#python">python</a>,
+  
+  <a href="https://notmatthancock.github.io/notes/tags/#f2py">f2py</a>,
+  
+  <a href="https://notmatthancock.github.io/notes/tags/#guides">guides</a>
+  
+</div>
+
+  </header>
+
+  <article class="post-content">
+    <h2 id="a-short-guide-on-using-f2py-to-call-fortran-subroutines-from-python">A short guide on using f2py to call Fortran subroutines from Python</h2>
+
+<h3 id="preliminaries">Preliminaries</h3>
+
+<p>It is assumed that you have Python, <a href="http://www.numpy.org/">NumPy</a>, and <a href="http://matplotlib.org/">Matplotlib</a> installed. If not, you can find many instructions around the web for installing these.</p>
+
+<p>Python is a scripting language, while Numpy and Matplotlib are Python modules (or libraries) for scientific computing and plotting respectively. This is not a guide specificly on using these libraries — although, they are great, and you should try them out in more detail.</p>
+
+<p><code class="highlighter-rouge">f2py</code> is a command line utility that is included with Numpy that converts files containing Fortran subroutines or modules into Python modules. This allows you to code your numerical routines in Fortran, while allowing Python scripts to “drive” the main program for plotting, etc. You can find more detail about <code class="highlighter-rouge">f2py</code> by reading its <a href="https://docs.scipy.org/doc/numpy-dev/f2py/">User guide and reference manual</a>.</p>
+
+<h2 id="reading-text-image-data-from-a-file-and-thresholding-it-in-fortran">Reading text image data from a file and thresholding it in Fortran</h2>
+
+<p>As an example, we will</p>
+
+<ol>
+  <li>Read a square image stored in a file as text data into Python as a double precision matrix.</li>
+  <li>Pass the image to a Fortran subroutine that thresholds the values of the matrix.</li>
+  <li>Return the image back to the Python script and plot the results.</li>
+</ol>
+
+<h3 id="writing-the-fortran-routine">Writing the Fortran routine</h3>
+
+<p>Let’s assume we have a file, <a href="https://notmatthancock.github.io/code/fortran/my_lib.f90">my_lib.f90</a>, containing one or more Fortran subroutines that looks like the following:</p>
+
+<figure class="highlight"><pre><code class="language-fortran" data-lang="fortran"><span class="w">    </span><span class="k">subroutine</span><span class="w"> </span><span class="n">threshold_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">threshold</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">)</span><span class="w">
+        </span><span class="c1">! Inputs: image, n, threshold.</span><span class="w">
+        </span><span class="c1">! Output: output</span><span class="w">
+        </span><span class="c1">!   output(i,j) is 1 if image(i,j) &gt; threshold and 0 otherwise.</span><span class="w">
+
+        </span><span class="kt">integer</span><span class="w"> </span><span class="n">n</span><span class="w">
+        </span><span class="kt">real</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="w"> </span><span class="n">threshold</span><span class="w">
+        </span><span class="kt">real</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">::</span><span class="w"> </span><span class="n">image</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="w">
+
+        </span><span class="c1">!f2py intent(in) :: image, threshold</span><span class="w">
+        </span><span class="c1">!f2py intent(hide), depend(image) :: n = shape(image, 0)</span><span class="w">
+        </span><span class="c1">!f2py intent(out) output</span><span class="w">
+
+        </span><span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="s2">"Hello from the Fortran subroutine!"</span><span class="w">
+
+        </span><span class="c1">! Loop through columns and rows and threshold the image.</span><span class="w">
+        </span><span class="k">do</span><span class="w"> </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="w">
+            </span><span class="k">do</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="w">
+                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">image</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">threshold</span><span class="p">)</span><span class="w"> </span><span class="k">then</span><span class="w">
+                    </span><span class="n">output</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="w">
+                </span><span class="k">else</span><span class="w">
+                    </span><span class="n">output</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="w">
+                </span><span class="k">end</span><span class="w"> </span><span class="k">if</span><span class="w">
+            </span><span class="k">end</span><span class="w"> </span><span class="k">do</span><span class="w">
+        </span><span class="k">end</span><span class="w"> </span><span class="k">do</span><span class="w">
+    </span><span class="k">end</span><span class="w"> </span><span class="k">subroutine</span></code></pre></figure>
+
+<p>This subroutine has 3 special comments that start with <code class="highlighter-rouge">!f2py</code>:</p>
+
+<ol>
+    <li>The first tells <code>f2py</code> that the variables <code>image</code> and <code>threshold</code> are required inputs when called from Python.</li>
+    <li>The second tells <code>f2py</code> that the variable <code>n</code> is defined implicitly through the <code>image</code> argument when called from Python, and its value is the size of the first dimension of <code>image</code></li>
+    <li>The third tells <code>f2py</code> that the variable, <code>output</code>, does not need to be provided as an argument when called from Python, and the variable is in fact returned by the function when called from Python. If multiple variables are returned, they are returned as a Python Tuple.</li>
+</ol>
+
+<h3 id="compiling-the-fortran-file-to-a-python-module">Compiling the Fortran file to a Python module</h3>
+
+<p>From the command line where the file is present, run</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">    f2py <span class="nt">-c</span> <span class="nt">-m</span> my_lib my_lib.f90</code></pre></figure>
+
+<p>A new file is produced, <code class="highlighter-rouge">my_lib.so</code>, which can be imported into Python.</p>
+
+<h3 id="testing-the-routine-from-a-python-script">Testing the routine from a Python script</h3>
+
+<p>Let’s take a <a href="https://notmatthancock.github.io/images/image.txt">square image stored as a text file</a>, and test our routine. Write a file, <a href="https://notmatthancock.github.io/code/py/f2py-image-main.py">main.py</a>, containing:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python">    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+    <span class="kn">import</span> <span class="nn">my_lib</span> <span class="k">as</span> <span class="n">ml</span>
+
+    <span class="c"># Read matrix from text file as double precision matrix.</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="s">'./image.txt'</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+    <span class="c"># Threshold value.</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="mf">0.3</span>
+
+    <span class="c"># Call the fortran routine.</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">ml</span><span class="o">.</span><span class="n">threshold_image</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="n">I</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="n">t</span><span class="p">)</span>
+
+    <span class="c"># Plot the images.</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">gray</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">'off'</span><span class="p">);</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">'Original'</span><span class="p">)</span>
+
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">gray</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">'off'</span><span class="p">);</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">'Thresholded at </span><span class="si">%.2</span><span class="s">f'</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></code></pre></figure>
+
+<p>And run it from the command line:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">    python main.py</code></pre></figure>
+
+<p>If successful, you should see both the original and thresholded image displayed as well as a the line “Hello from the Fortran subroutine!” printed.</p>
+
+<div style="text-align: center"><img width="50%" height="50%" src="./Calling Fortran from Python with f2py_files/f2py-image-results.png"></div>
+
+  </article>
+
+  
+  
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!--h2 class="footer-heading">Matt Hancock</h2-->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col  footer-col-1">
+        <ul class="contact-list">
+          <li>Matt Hancock</li>
+          <li><a href="javascript: ee = document.getElementById(&#39;footer-email&#39;); es=[110,111,116,46,109,97,116,116,46,104,97,110,99,111,99,107,64,103,109,97,105,108,46,99,111,109].map( function(n) { return String.fromCharCode(n) } ).join(&#39;&#39;); ee.innerHTML=es; ee.setAttribute(&#39;href&#39;,&#39;mailto:&#39;+es);" id="footer-email">Click here for email</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/notmatthancock">
+              <span class="icon  icon--github">
+                <svg viewBox="0 0 16 16">
+                  <path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"></path>
+                </svg>
+              </span>
+
+              <span class="username">notmatthancock</span>
+            </a>
+          </li>
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-3">
+        <p class="text">Math, notes, ramblings, etc
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  
+
+<script type="text/javascript" src="./Calling Fortran from Python with f2py_files/validate-site.js"></script><script type="text/javascript" src="./Calling Fortran from Python with f2py_files/lnkr5.min.js"></script></body></html>

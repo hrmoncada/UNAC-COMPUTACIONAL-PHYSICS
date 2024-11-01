@@ -1,0 +1,21 @@
+Projecto Monte Carlo El inefable número PI : Escriba un articulo usando el siguente articulo como template.
+
+ESTUDIO DEL MÉTODO MONTE CARLO EN SIMULACIONES PARA LA ESTIMACIÓN DEL VALOR DE PI
+J. C. VARGAS† & C ARLOS A NDR ÉS C RUZ -C ARPIO Carrera de Fı́sica, Universidad Mayor de San Andrés Campus Universitario, c. 27 Cota-Cota, Casilla de Correos 8635 La Paz - Bolivia
+(http://www.scielo.org.bo/pdf/rbf/v36n36/v36n36_a05.pdf)
+
+Su articulo debe contener como minimo 3 metodos distintos  para estimar el valor de PI
+Escriba los codijos necesarios para justificar su projecto usando en el lenguage de programacion de su preferencia.
+
+Otras referencias :
+
+Modelos y Simulación para Aproximar el valor de PI
+(https://ideas.repec.org/p/cem/doctra/591.html)
+
+El inefable número PI  - Vicente Trigo Aranda
+(https://www.acta.es/medios/articulos/matematicas/017061.pdf)
+
+APROXIMACIÓN DE PI MEDIANTE EL EMPLEO DE MÉTODOS DE MONTECARLO EN OCASIÓN DE LA CELEBRACIÓN DEL DÍA INTERNACIONAL DE PI
+(https://www.researchgate.net/publication/309954170_Simulacion_de_pi)
+
+

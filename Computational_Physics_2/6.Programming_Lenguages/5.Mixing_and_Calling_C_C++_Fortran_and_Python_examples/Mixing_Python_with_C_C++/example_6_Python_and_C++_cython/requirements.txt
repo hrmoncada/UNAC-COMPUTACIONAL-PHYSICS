@@ -1,0 +1,239 @@
+cffi==1.13.2
+Cython==0.29.14
+invoke==1.3.0
+pybind11==2.4.3
+pycparser==2.19
+
+
+https://realpython.com/python-bindings-overview/
+
+0. Navegate into the followinbg fodler
+Diana:example_1_python_materials-python-bindings$
+
+1. Install the following python tools
+python -m pip install --upgrade pip
+python3 -m pip install cffi
+python3 -m pip install Cython
+python3 -m pip install pybind11
+python3 -m pip install pycparser
+python3 -m pip install invoke
+python3 -m pip install cppyy
+python3 -m pip install boost
+python3 -m pip install aptitude  <= search tool
+
+2. Run the following comnand "invoke build-cmult" produces "libcmult.so"
+$ invoke build-cmult
+==================================================
+= Building C Library 
+* Complete
+
+Diana:example_1_python_materials-python-bindings$ ll
+total 88K
+drwxrwxr-x  2 hrmoncada hrmoncada 4.0K Aug  1 12:17 .
+drwxr--r-- 10 hrmoncada hrmoncada 4.0K Aug  1 11:06 ..
+-rw-rw-r--  1 hrmoncada hrmoncada  510 Aug  1  2022 README.md
+-rw-rw-r--  1 hrmoncada hrmoncada  310 Aug  1  2022 cffi_test.py
+-rw-rw-r--  1 hrmoncada hrmoncada  282 Aug  1  2022 cmult.c
+-rw-rw-r--  1 hrmoncada hrmoncada  164 Aug  1  2022 cmult.h
+-rw-rw-r--  1 hrmoncada hrmoncada 1.8K Aug  1 12:15 cmult.o
+-rw-rw-r--  1 hrmoncada hrmoncada  403 Aug  1  2022 cppmult.cpp
+-rw-rw-r--  1 hrmoncada hrmoncada  236 Aug  1  2022 cppmult.hpp
+-rw-rw-r--  1 hrmoncada hrmoncada  947 Aug  1  2022 ctypes_cpp_test.py
+-rw-rw-r--  1 hrmoncada hrmoncada  937 Aug  1  2022 ctypes_c_test.py
+-rw-rw-r--  1 hrmoncada hrmoncada  213 Aug  1  2022 cython_example.pyx
+-rw-rw-r--  1 hrmoncada hrmoncada  196 Aug  1  2022 cython_test.py
+-rwxrwxr-x  1 hrmoncada hrmoncada  16K Aug  1 12:15 libcmult.so            <=====*.so
+-rw-rw-r--  1 hrmoncada hrmoncada  250 Aug  1  2022 pybind11_test.py
+-rw-rw-r--  1 hrmoncada hrmoncada  246 Aug  1  2022 pybind11_wrapper.cpp
+-rw-rw-r--  1 hrmoncada hrmoncada 1.3K Aug  1 12:17 requirements.txt
+-rw-rw-r--  1 hrmoncada hrmoncada 5.5K Aug  1  2022 tasks.py
+
+3. To see which tasks are available, you use the --list option:
+
+Diana:example_1_python_materials-python-bindings$ invoke --list
+Available tasks:
+
+  all               Build and run all tests
+  build-cffi        Build the CFFI Python bindings
+  build-cmult       Build the shared library for the sample C code
+  build-cppmult     Build the shared library for the sample C++ code
+  build-cython      Build the cython extension module
+  build-pybind11    Build the pybind11 wrapper library
+  clean             Remove any built objects
+  test-cffi         Run the script to test CFFI
+  test-ctypes       Run the script to test ctypes
+  test-ctypes-cpp   Run the script to test ctypes
+  test-cython       Run the script to test Cython
+  test-pybind11     Run the script to test PyBind11
+  
+3.1 In addition, there are two special tasks added for convenience:
+
+"invoke all" runs the build and test tasks for all tools.
+"invoke clean" removes any generated files.
+
+4. ctypes It is a tool in the standard library for creating Python bindings.
+
+Run this code, it returns the product of the two numbers you passed in. 
+
+$ invoke test-ctypes
+==================================================
+= Testing ctypes Module for C 
+libname:  /home/hrmoncada/Desktop/TOOls/GNU_GCC_C_C++_C#/Examples/Mixing_and_Calling_C_C++_Fortran_and_Python_examples/Mixing_with_Python/example_1_python_materials-python-bindings
+    In cmult : int 6 float 2.3 returning  13.8
+    In Python: int: 6 float 2.3 return val 47.0
+
+    In cmult : int 6 float 2.3 returning  13.8
+    In Python: int: 6 float 2.3 return val 13.8
+
+
+5. CFFI is the C Foreign Function Interface for Python. Run on the command line to build the Python bindings.
+ Run the following comnand "invoke build-cffi" produces "cffi_example.cpython-38-x86_64-linux-gnu.so"
+
+$ invoke build-cffi
+==================================================
+= Building CFFI Module 
+* Complete
+
+Diana:example_1_python_materials-python-bindings$ ll
+total 176K
+drwxrwxr-x  2 hrmoncada hrmoncada 4.0K Aug  1 12:29 .
+drwxr--r-- 10 hrmoncada hrmoncada 4.0K Aug  1 11:06 ..
+-rw-rw-r--  1 hrmoncada hrmoncada  510 Aug  1  2022 README.md
+-rw-rw-r--  1 hrmoncada hrmoncada  23K Aug  1 12:29 cffi_example.c
+-rw-rw-r--  1 hrmoncada hrmoncada  29K Aug  1 12:29 cffi_example.o
+-rwxrwxr-x  1 hrmoncada hrmoncada  31K Aug  1 12:29 cffi_example.cpython-38-x86_64-linux-gnu.so   <=====*.so
+-rw-rw-r--  1 hrmoncada hrmoncada  310 Aug  1  2022 cffi_test.py
+-rw-rw-r--  1 hrmoncada hrmoncada  282 Aug  1  2022 cmult.c
+-rw-rw-r--  1 hrmoncada hrmoncada  164 Aug  1  2022 cmult.h
+-rw-rw-r--  1 hrmoncada hrmoncada 1.8K Aug  1 12:15 cmult.o
+-rw-rw-r--  1 hrmoncada hrmoncada  403 Aug  1  2022 cppmult.cpp
+-rw-rw-r--  1 hrmoncada hrmoncada  236 Aug  1  2022 cppmult.hpp
+-rw-rw-r--  1 hrmoncada hrmoncada  947 Aug  1  2022 ctypes_cpp_test.py
+-rw-rw-r--  1 hrmoncada hrmoncada  937 Aug  1  2022 ctypes_c_test.py
+-rw-rw-r--  1 hrmoncada hrmoncada  213 Aug  1  2022 cython_example.pyx
+-rw-rw-r--  1 hrmoncada hrmoncada  196 Aug  1  2022 cython_test.py
+-rwxrwxr-x  1 hrmoncada hrmoncada  16K Aug  1 12:15 libcmult.so                                 <=====*.so
+-rw-rw-r--  1 hrmoncada hrmoncada  250 Aug  1  2022 pybind11_test.py
+-rw-rw-r--  1 hrmoncada hrmoncada  246 Aug  1  2022 pybind11_wrapper.cpp
+-rw-rw-r--  1 hrmoncada hrmoncada 1.3K Aug  1 12:17 requirements.txt
+-rw-rw-r--  1 hrmoncada hrmoncada 5.5K Aug  1  2022 tasks.py
+
+
+6. This runs your cffi_test.py program 
+Diana:example_1_python_materials-python-bindings$ invoke test-cffi
+==================================================
+= Testing CFFI Module 
+/bin/bash: python: command not foun
+
+
+7. PyBind11 takes a quite different approach to create Python bindings. In addition to shifting the focus from C to C++, it also uses C++ to specify and build the module, allowing it to take advantage of the metaprogramming tools in C++. Like CFFI, the Python bindings generated from PyBind11 are a full Python module that can be imported and used directly.
+
+8. Run the following comnand "invoke build-cppmult" to produces "libcppmult.so"
+$ invoke build-cppmult
+==================================================
+= Building C++ Library 
+* Complete
+
+Diana:example_1_python_materials-python-bindings$ ll
+total 200K
+drwxrwxr-x  2 hrmoncada hrmoncada 4.0K Aug  1 14:21 .
+drwxr--r-- 10 hrmoncada hrmoncada 4.0K Aug  1 11:06 ..
+-rw-rw-r--  1 hrmoncada hrmoncada  510 Aug  1  2022 README.md
+-rw-rw-r--  1 hrmoncada hrmoncada  23K Aug  1 12:29 cffi_example.c
+-rw-rw-r--  1 hrmoncada hrmoncada  29K Aug  1 12:29 cffi_example.o
+-rwxrwxr-x  1 hrmoncada hrmoncada  31K Aug  1 12:29 cffi_example.cpython-38-x86_64-linux-gnu.so   <=====*.so
+-rw-rw-r--  1 hrmoncada hrmoncada  310 Aug  1  2022 cffi_test.py
+-rw-rw-r--  1 hrmoncada hrmoncada  282 Aug  1  2022 cmult.c
+-rw-rw-r--  1 hrmoncada hrmoncada  164 Aug  1  2022 cmult.h
+-rw-rw-r--  1 hrmoncada hrmoncada 1.8K Aug  1 12:15 cmult.o
+-rw-rw-r--  1 hrmoncada hrmoncada  403 Aug  1  2022 cppmult.cpp
+-rw-rw-r--  1 hrmoncada hrmoncada  236 Aug  1  2022 cppmult.hpp
+-rw-rw-r--  1 hrmoncada hrmoncada  947 Aug  1  2022 ctypes_cpp_test.py
+-rw-rw-r--  1 hrmoncada hrmoncada  937 Aug  1  2022 ctypes_c_test.py
+-rw-rw-r--  1 hrmoncada hrmoncada  213 Aug  1  2022 cython_example.pyx
+-rw-rw-r--  1 hrmoncada hrmoncada  196 Aug  1  2022 cython_test.py
+-rwxrwxr-x  1 hrmoncada hrmoncada  16K Aug  1 12:15 libcmult.so                               <=====*.so
+-rwxrwxr-x  1 hrmoncada hrmoncada  17K Aug  1 14:21 libcppmult.so                              <=====*.so
+-rw-rw-r--  1 hrmoncada hrmoncada  250 Aug  1  2022 pybind11_test.py
+-rw-rw-r--  1 hrmoncada hrmoncada  246 Aug  1  2022 pybind11_wrapper.cpp
+-rw-rw-r--  1 hrmoncada hrmoncada 5.6K Aug  1 12:43 requirements.txt
+-rw-rw-r--  1 hrmoncada hrmoncada 5.5K Aug  1  2022 tasks.py
+
+9. On # tasks.py, Line 4 is the first step of the magic. It calls the pybind11 module to have it produce the proper include paths for PyBind11. You can run this command directly on the console to see what it does:
+
+Diana:example_1_python_materials-python-bindings$ python3 -m pybind11 --includes
+-I/usr/include/python3.8 
+-I/home/hrmoncada/.local/lib/python3.8/site-packages/pybind11/include
+
+
+Diana:example_1_python_materials-python-bindings$ python3.8-config --extension-suffix
+.cpython-38-x86_64-linux-gnu.so
+
+Diana:example_1_python_materials-python-bindings$ invoke test-pybind11
+==================================================
+= Testing PyBind11 Module 
+Traceback (most recent call last):
+  File "pybind11_test.py", line 2, in <module>
+    import pybind11_example
+ModuleNotFoundError: No module named 'pybind11_example'
+
+
+10. Cython: The approach Cython takes to creating Python bindings uses a Python-like language to define the bindings and then generates C or C++ code that can be compiled into the module. There are several methods for building Python bindings with Cython. The most common one is to use setup from distutils. 
+
+On # cython_example.pyx. There are two sections here:
+
+Lines 3 and 4 tell Cython that you’re using cppmult() from cppmult.hpp.
+Lines 6 and 7 create a wrapper function, pymult(), to call cppmult().
+
+11. Run the following comnand "invoke build-cython" to produces "cython_example"
+Diana:example_1_python_materials-python-bindings$ invoke build-cython
+==================================================
+= Building C++ Library 
+* Complete
+==================================================
+= Building Cython Module 
+/bin/bash: python3.7-config: command not found
+* Complete
+Diana:example_1_python_materials-python-bindings$ ll
+total 356K
+drwxrwxr-x  2 hrmoncada hrmoncada 4.0K Aug  1 15:11 .
+drwxr--r-- 10 hrmoncada hrmoncada 4.0K Aug  1 11:06 ..
+-rw-rw-r--  1 hrmoncada hrmoncada  510 Aug  1  2022 README.md
+-rw-rw-r--  1 hrmoncada hrmoncada  23K Aug  1 12:29 cffi_example.c
+-rw-rw-r--  1 hrmoncada hrmoncada  29K Aug  1 12:29 cffi_example.o
+-rwxrwxr-x  1 hrmoncada hrmoncada  31K Aug  1 12:29 cffi_example.cpython-38-x86_64-linux-gnu.so   <=====*.so
+-rw-rw-r--  1 hrmoncada hrmoncada  310 Aug  1  2022 cffi_test.py
+-rw-rw-r--  1 hrmoncada hrmoncada  282 Aug  1  2022 cmult.c
+-rw-rw-r--  1 hrmoncada hrmoncada  164 Aug  1  2022 cmult.h
+-rw-rw-r--  1 hrmoncada hrmoncada 1.8K Aug  1 12:15 cmult.o
+-rw-rw-r--  1 hrmoncada hrmoncada  403 Aug  1  2022 cppmult.cpp
+-rw-rw-r--  1 hrmoncada hrmoncada  236 Aug  1  2022 cppmult.hpp
+-rw-rw-r--  1 hrmoncada hrmoncada  947 Aug  1  2022 ctypes_cpp_test.py
+-rw-rw-r--  1 hrmoncada hrmoncada  937 Aug  1  2022 ctypes_c_test.py
+-rwxrwxr-x  1 hrmoncada hrmoncada  34K Aug  1 15:11 cython_example                            <=====*.so
+-rw-rw-r--  1 hrmoncada hrmoncada  213 Aug  1  2022 cython_example.pyx
+-rw-rw-r--  1 hrmoncada hrmoncada  196 Aug  1  2022 cython_test.py
+-rw-rw-r--  1 hrmoncada hrmoncada 117K Aug  1 15:11 cython_wrapper.cpp
+-rwxrwxr-x  1 hrmoncada hrmoncada  16K Aug  1 12:15 libcmult.so                                <=====*.so
+-rwxrwxr-x  1 hrmoncada hrmoncada  17K Aug  1 15:11 libcppmult.so                              <=====*.so
+-rw-rw-r--  1 hrmoncada hrmoncada  250 Aug  1  2022 pybind11_test.py
+-rw-rw-r--  1 hrmoncada hrmoncada  246 Aug  1  2022 pybind11_wrapper.cpp
+-rw-rw-r--  1 hrmoncada hrmoncada 7.5K Aug  1 14:28 requirements.txt
+-rw-rw-r--  1 hrmoncada hrmoncada 5.5K Aug  1  2022 tasks.py
+
+12. Using invoke to run your test produces the following:
+Diana:example_1_python_materials-python-bindings$ invoke test-cython
+==================================================
+= Testing Cython Module 
+Traceback (most recent call last):
+  File "cython_test.py", line 2, in <module>
+    import cython_example
+ModuleNotFoundError: No module named 'cython_example'
+
+
+
+
+
+
+
+

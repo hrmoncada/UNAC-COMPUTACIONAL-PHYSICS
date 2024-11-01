@@ -1,0 +1,37 @@
+1.First,second and third Order System Simulation
+https://apmonitor.com/pdc/index.php/Main/ModelSimulation
+https://towardsdatascience.com/on-simulating-non-linear-dynamic-systems-with-python-or-how-to-gain-insights-without-using-ml-353eebf8dcc3
+
+2.Nonlinear ODEs in 2D
+https://github.com/marl0ny/Nonlinear-ODE-2D
+https://github.com/marl0ny/Nonlinear-ODE-2D.git
+
+3. Non-linear-dynamics-Strogatz
+https://github.com/Llewelyn62/Non-linear-dynamics-Strogatz
+https://github.com/Llewelyn62/Non-linear-dynamics-Strogatz.git
+
+4.nolte/Python-Programs-for-Nonlinear-Dynamics
+https://github.itap.purdue.edu/nolte/Python-Programs-for-Nonlinear-Dynamics
+https://github.itap.purdue.edu/nolte/Python-Programs-for-Nonlinear-Dynamics.git
+
+5.Nonlinear-Dynamics-and-Chaos (DOES NOT WORK)
+https://github.com/DeysZam/Nonlinear-Dynamics-and-Chaos
+https://github.com/DeysZam/Nonlinear-Dynamics-and-Chaos.git
+
+6.Lecture notes and material
+https://github.com/loiseaujc/Teaching
+https://github.com/loiseaujc/Teaching.git
+
+Python Programs for Nonlinear Dynamics
+
+https://galileo-unbound.blog/table-of-contents/python-programs-for-nonlinear-dynamics/
+
+
+Using a terminal:
+python -c "import scipy; print(scipy.__version__)"
+
+Using a program:
+import scipy
+print scipy.__version__    # python2
+print (scipy.__version__)  # python3
+

@@ -1,0 +1,16 @@
+products: c.out p.out
+
+p.out: mp.o p.o 
+	/usr/bin/gcc -o p.out p.o mp.o libgpc.a libmyminuit.a libf2c.a
+	
+p.o: Minuit_Main.p
+	/usr/bin/gpc -c -o p.o Minuit_Main.p
+
+mp.o: Minuit.p
+	/usr/bin/gpc -c -o mp.o Minuit.p
+
+c.out: Minuit_Main.c Minuit.h
+	/usr/bin/gcc -o c.out Minuit_Main.c libmyminuit.a libf2c.a
+
+clean: 
+	rm *.o *.out *.gpi

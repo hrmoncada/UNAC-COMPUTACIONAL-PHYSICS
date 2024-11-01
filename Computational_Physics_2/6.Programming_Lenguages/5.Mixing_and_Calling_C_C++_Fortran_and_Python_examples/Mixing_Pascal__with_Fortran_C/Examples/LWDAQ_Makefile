@@ -1,0 +1,119 @@
+# LWDAQ Makefile
+
+# Determine the operating system.
+PLATFORM = UNIX
+ifneq ($(shell uname | grep Darwin),)
+	PLATFORM = MacOS
+else 
+	ifneq ($(shell uname | grep CYGWIN),)
+		PLATFORM = Windows
+	else 
+		ifneq ($(shell uname | grep Linux),)
+			PLATFORM = Linux
+		endif
+	endif
+endif
+
+# If you are compiling for an architecture other than 
+# the default local architecture, how do you tell the
+# Pascal and C compilers to compile for the foreign 
+# architecture? On MacOS, to compile for PPC on an i386
+# platform, set GPC_ARCH to "-ppc" and GCC_ARCH to 
+# "-arch ppc". To compile for i386 on a PPC platform,
+# set GPC_ARCH to "-i386" and GCC_ARCH to "-arch i386". 
+# If you want to use the local architecture, just leave
+# both symbols blank.
+GPC_ARCH = 
+GCC_ARCH = 
+
+# Keyword that directs GCC to build a shared library.
+# This keyword depends upon the platform.
+ifeq ($(PLATFORM),MacOS)
+	SO = -dynamiclib
+else
+	SO = -shared
+endif
+
+# Determine the location of the pascal libraries.
+PAS_LIB = $(shell gpc --print-file-name libgpc.a)
+
+# Determine the location of the TCL/TK libraries.
+# On Windows and MacOS we have to tell the compiler
+# where to find the libraries, but on Linux we assume
+# the TCL/TK libraries are in the standard search
+# path.
+ifeq ($(PLATFORM),MacOS)
+	TCLTK_LIB = \
+		-F../LWDAQ.app/Contents/Frameworks \
+		-framework Tcl \
+		-framework Tk
+else
+	ifeq ($(PLATFORM),Windows)
+		TCLTK_LIB = \
+			../LWDAQ.app/Contents/Windows/bin/tcl84.dll \
+			../LWDAQ.app/Contents/Windows/bin/tk84.dll 
+	else
+		TCLTK_LIB = 
+	endif
+endif
+
+# Name and location of the LWDAQ shared library.
+LWDAQ = ../LWDAQ.app/Contents/LWDAQ/$(PLATFORM)/lwdaq.so
+
+# Name and location of ANALYSIS shared library.
+ANALYSIS = analysis.so
+
+# Where are the Pascal sources?
+SRC_DIR = ../Sources
+
+# Objects required by lwdaq.so, p.exe, and c.exe.
+OBJA = utils.o images.o transforms.o image_manip.o rasnik.o centroid.o bcam.o calibration.o electronics.o
+	
+# Objects required by lwdaq.so only.
+OBJB = tcltk.o lwdaq.o
+
+# Objects required by c.exe only.
+OBJC = analysis.o
+
+# Pascal compiler options. We recommend -O3 for faster
+# code (but slower compile). You can use -DUSE_TCL_STUBS to
+# set the USE_TCL_STUBS symbol when you compile lwdaq.o, and so
+# add the TCL and TK stub table initialization routine to the
+# LWDAQ initialization routine.
+GPC_OPTIONS =
+
+# Define the default products of a call to this makefile.
+products: $(LWDAQ)
+
+# How to compile the Pascal console program.
+p: p.pas $(OBJA)
+	gpc$(GPC_ARCH) -o p.exe p.pas $(OBJA)
+
+# How to compile the C console program.
+c: c.c $(OBJA) $(OBJC)
+	gcc $(GCC_ARCH) -o c.exe c.c $(OBJA) $(OBJC) $(PAS_LIB)
+
+# How to compile the LWDAQ shared library. If you want
+# to use the TCL and TK stubs, you have to tell the linker
+# not to export symbols from the TCL and TK stub libraries.
+# You add "-Wl,--exclude-libs,tclstub84.lib" if the TCL stub
+# library is in the default directory and named tclstub84.lib.
+# You add a similar command for the TK stub library. You will
+# still get a couple of warnings during the link, but they
+# are harmless. The "-Wl" option forwards its arguments to the
+# linker. The linker is the "ld" utility.
+$(LWDAQ): $(OBJA) $(OBJB)
+	gcc $(GCC_ARCH) $(SO) -o $(LWDAQ) $(OBJA) $(OBJB) $(TCLTK_LIB) $(PAS_LIB)
+
+
+# How to compile analysis.pas.
+analysis.o: $(SRC_DIR)/analysis.pas
+	gpc$(GPC_ARCH) -c -o $@ $< $(GPC_OPTIONS) --gpc-main=Analysis_Main
+
+# How to compile remaining pascal source files.
+%.o: $(SRC_DIR)/%.pas
+	gpc$(GPC_ARCH) -c -o $@ $< $(GPC_OPTIONS)
+
+# How to clean up the intermediate products.
+clean: 
+	rm *.o *.gpi

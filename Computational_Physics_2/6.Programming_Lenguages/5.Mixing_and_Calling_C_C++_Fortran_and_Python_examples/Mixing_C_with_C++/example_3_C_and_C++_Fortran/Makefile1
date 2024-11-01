@@ -1,0 +1,14 @@
+$(info Mixing Code in C, C++, and FORTRAN )
+compile:
+# Compile the C code into object file as:
+	gcc -c main.c  cfunction.c	
+# Compile the C++ code into object file as:
+	g++ -c cppfunction.cpp		
+# Compile the Fortran90  code into object file as:
+	gfortran -c f90function.f90	
+link: # Link the object files with C as:
+	gcc -o out  main.o f90function.o cppfunction.o cfunction.o
+run: # Execute out
+	./out
+clean:
+	rm -f *.o  out
