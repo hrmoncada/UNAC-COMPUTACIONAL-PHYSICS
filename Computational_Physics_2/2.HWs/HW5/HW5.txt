@@ -7,7 +7,12 @@ J. C. VARGAS† & C ARLOS A NDR ÉS C RUZ -C ARPIO Carrera de Fı́sica, Univers
 Su articulo debe contener como minimo 3 metodos distintos  para estimar el valor de PI
 Escriba los codijos necesarios para justificar su projecto usando en el lenguage de programacion de su preferencia.
 
-Otras referencias :
+1. Cuerpo del articulo  ( minimo 3 metodos distintos  para estimar el valor de PI) 
+2. Desarrollar codijo en serie de cada metodo, y su implentacion usan MPI (Paralelo)
+
+Nota : Abstract +  Introduccion + Conclusiones en la Tarea 6
+
+Otras referecias :
 
 Modelos y Simulación para Aproximar el valor de PI
 (https://ideas.repec.org/p/cem/doctra/591.html)
@@ -17,5 +22,4 @@ El inefable número PI  - Vicente Trigo Aranda
 
 APROXIMACIÓN DE PI MEDIANTE EL EMPLEO DE MÉTODOS DE MONTECARLO EN OCASIÓN DE LA CELEBRACIÓN DEL DÍA INTERNACIONAL DE PI
 (https://www.researchgate.net/publication/309954170_Simulacion_de_pi)
-
 
